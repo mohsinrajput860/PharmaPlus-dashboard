@@ -38,9 +38,8 @@ export default function LoginPage() {
       <div className="relative w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex flex-col items-center gap-3 mb-4">
-            <img src="/logo/pharmapluslogo.png" alt="PharmaPlus" className="w-20 h-20 object-contain" />
-            <img src="/logo/madevstudio.png" alt="MA Dev Studio" className="h-8 object-contain opacity-90" />
+          <div className="flex justify-center mb-4">
+            <img src="/logo/pharmapluslogo.png" alt="PharmaPlus" className="w-16 h-16 object-contain" />
           </div>
           <h1 className="text-2xl font-bold text-white">PharmaPlus</h1>
           <p className="text-slate-400 text-sm mt-1">Developer Panel — Secure Access</p>
@@ -114,9 +113,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <div className="text-center mt-6 opacity-40">
-          <p className="text-xs text-slate-500">© 2026 MA Dev Studio</p>
-        </div>
+        <p className="text-center mt-6 text-xs text-slate-600">© 2026 MA Dev Studio</p>
       </div>
     </div>
   );
