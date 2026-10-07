@@ -56,3 +56,10 @@ export const machinesApi = {
   updateFeatures: (hwid, flags) => request('PUT',    `/api/admin/machines/${encodeURIComponent(hwid)}/features`, flags),
   getLogs:        (hwid)        => request('GET',    `/api/admin/machines/${encodeURIComponent(hwid)}/logs`),
 };
+
+// ── Trial Requests ────────────────────────────────────────────────────────────
+export const trialRequestsApi = {
+  list:    (status = 'pending') => request('GET',  `/api/admin/trial-requests?status=${status}`),
+  approve: (id)                 => request('POST', `/api/admin/trial-requests/${id}/approve`),
+  reject:  (id)                 => request('POST', `/api/admin/trial-requests/${id}/reject`),
+};
