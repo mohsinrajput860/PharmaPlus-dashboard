@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Users, Search, Filter, Phone, MapPin, Clock, Monitor } from 'lucide-react';
+import { Users, Search, Phone, MapPin, Clock, Monitor } from 'lucide-react';
 import { machinesApi } from '../api/client.js';
 import PageHeader from '../components/PageHeader.jsx';
 import Badge from '../components/Badge.jsx';
@@ -45,12 +45,11 @@ export default function AllMachinesPage() {
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, HWID, owner, city..."
             className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20" />
         </div>
-        {/* Status filter — wrap on mobile */}
-        <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 flex-wrap">
-          <Filter size={13} className="text-slate-400 ml-1.5 flex-shrink-0" />
+        {/* Status filter — single line, compact */}
+        <div className="flex items-center gap-0.5 bg-white border border-slate-200 rounded-xl p-1">
           {STATUS_OPTS.map(s => (
             <button key={s} onClick={() => setStatus(s)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${
+              className={`flex-1 py-1.5 rounded-lg text-[11px] font-semibold capitalize transition-colors text-center ${
                 status === s ? 'bg-sky-500 text-white' : 'text-slate-500 hover:bg-slate-50'
               }`}>
               {s}
