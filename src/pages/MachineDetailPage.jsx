@@ -7,8 +7,8 @@ import ConfirmModal from '../components/ConfirmModal.jsx';
 import {
   ArrowLeft, Monitor, Phone, MapPin, User, Calendar, Clock,
   CheckCircle2, ShieldOff, Gift, RefreshCw, Save, Trash2,
-  Activity, Hash, Smartphone, CloudUpload, BarChart2,
-  ShoppingCart, DollarSign, RotateCcw, Truck, Users, Network,
+  Activity, Hash, Smartphone, CloudUpload,
+  Users, Network,
   AlertTriangle, Edit3, X, Check, Info
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
@@ -23,15 +23,10 @@ const DURATION_OPTIONS = [
 ];
 
 const FEATURE_LIST = [
-  { key: 'mobile_app',     icon: Smartphone,   label: 'Mobile App',       desc: 'Companion mobile app connectivity & QR access' },
-  { key: 'cloud_backup',   icon: CloudUpload,  label: 'Cloud Backup',     desc: 'Google Drive automatic backup feature' },
-  { key: 'reports',        icon: BarChart2,    label: 'Reports',          desc: 'Sales, stock, and analytics reports' },
-  { key: 'purchases',      icon: ShoppingCart, label: 'Purchases',        desc: 'Purchase orders and stock receiving' },
-  { key: 'expenses',       icon: DollarSign,   label: 'Expenses',         desc: 'Expense tracking and categories' },
-  { key: 'returns_module', icon: RotateCcw,    label: 'Returns',          desc: 'Customer returns & refunds module' },
-  { key: 'suppliers',      icon: Truck,        label: 'Suppliers',        desc: 'Supplier management and contacts' },
-  { key: 'multi_user',     icon: Users,        label: 'Multi-User',       desc: 'Multiple staff accounts with permissions' },
-  { key: 'lan_sync',       icon: Network,      label: 'LAN Sync',         desc: 'Multi-desktop local network sync' },
+  { key: 'mobile_app',   icon: Smartphone,  label: 'Mobile App',   desc: 'Companion mobile app connectivity & QR access' },
+  { key: 'cloud_backup', icon: CloudUpload, label: 'Cloud Backup', desc: 'Google Drive automatic backup feature' },
+  { key: 'multi_user',   icon: Users,       label: 'Multi-User',   desc: 'Multiple staff accounts with permissions' },
+  { key: 'lan_sync',     icon: Network,     label: 'LAN Sync',     desc: 'Multi-desktop local network sync' },
 ];
 
 const LOG_COLORS = {
@@ -76,11 +71,6 @@ export default function MachineDetailPage() {
         setFeatures({
           mobile_app:     data.machine.mobile_app     ?? 1,
           cloud_backup:   data.machine.cloud_backup   ?? 1,
-          reports:        data.machine.reports        ?? 1,
-          purchases:      data.machine.purchases      ?? 1,
-          expenses:       data.machine.expenses       ?? 1,
-          returns_module: data.machine.returns_module ?? 1,
-          suppliers:      data.machine.suppliers      ?? 1,
           multi_user:     data.machine.multi_user     ?? 1,
           lan_sync:       data.machine.lan_sync       ?? 1,
         });
