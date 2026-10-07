@@ -197,12 +197,14 @@ export default function MachineDetailPage() {
           <ArrowLeft size={18} />
         </button>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold text-white break-words min-w-0">{machine.shop_name}</h1>
-            <Badge status={machine.status} />
-            {machine.is_permanent && (
-              <span className="text-xs bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 px-2 py-0.5 rounded-full">Permanent</span>
-            )}
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-2xl font-bold text-white break-all">{machine.shop_name}</h1>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Badge status={machine.status} />
+              {machine.is_permanent && (
+                <span className="text-xs bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 px-2 py-0.5 rounded-full">Permanent</span>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-4 mt-1.5 text-sm text-slate-500 flex-wrap">
             {machine.owner_name && <span className="flex items-center gap-1"><User size={13} />{machine.owner_name}</span>}
