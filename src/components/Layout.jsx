@@ -64,7 +64,7 @@ export default function Layout() {
       <aside className={`${collapsed ? 'w-16' : 'w-64'} flex-shrink-0 bg-white border-r border-slate-200 flex flex-col transition-all duration-300 shadow-sm`}>
 
         {/* Logo — click to toggle sidebar */}
-        <div className="flex items-center justify-between px-4 h-16 border-b border-slate-200">
+        <div className="flex items-center justify-between px-4 h-20 border-b border-slate-200">
           {collapsed ? (
             <img
               src="/logo/pharmapluslogo.png"
@@ -77,7 +77,7 @@ export default function Layout() {
               src="/nameimage/pharmaplus.png"
               alt="PharmaPlus"
               onClick={() => setCollapsed(true)}
-              className="h-44 w-auto object-contain flex-1 cursor-pointer hover:opacity-80 transition-opacity"
+              className="h-48 w-auto object-contain flex-1 cursor-pointer hover:opacity-80 transition-opacity"
             />
           )}
           <button
