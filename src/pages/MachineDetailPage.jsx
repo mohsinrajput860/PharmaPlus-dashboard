@@ -196,9 +196,9 @@ export default function MachineDetailPage() {
         <button onClick={() => navigate('/machines')} className="p-2 rounded-lg border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors mt-0.5">
           <ArrowLeft size={18} />
         </button>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold text-white">{machine.shop_name}</h1>
+            <h1 className="text-2xl font-bold text-white break-words min-w-0">{machine.shop_name}</h1>
             <Badge status={machine.status} />
             {machine.is_permanent && (
               <span className="text-xs bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 px-2 py-0.5 rounded-full">Permanent</span>
