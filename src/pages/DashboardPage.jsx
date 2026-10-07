@@ -1,276 +1,268 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { statsApi, machinesApi, trialRequestsApi } from '../api/client.js';
-import StatCard from '../components/StatCard.jsx';
-import Badge from '../components/Badge.jsx';
 import {
   Monitor, CheckCircle2, Clock, ShieldOff, AlertTriangle,
-  RefreshCw, UserPlus, Activity, Eye, Phone, Bell, Check, X
+  RefreshCw, Bell, Activity, Gift, ChevronRight,
+  Phone, MapPin, Check, X, TrendingUp, Users
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const [stats,   setStats]   = useState(null);
-  const [recent,  setRecent]  = useState([]);
-  const [expiring,setExpiring]= useState([]);
+  const [stats,     setStats]     = useState(null);
   const [trialReqs, setTrialReqs] = useState([]);
-  const [actionLoading, setActionLoading] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [expiring,  setExpiring]  = useState([]);
+  const [loading,   setLoading]   = useState(true);
+  const [actioning, setActioning] = useState(null);
+  const [toast,     setToast]     = useState(null);
 
   async function load() {
     setLoading(true);
     try {
-      const [sRes, mRes, eRes, tRes] = await Promise.all([
+      const [sRes, tRes, eRes] = await Promise.all([
         statsApi.get(),
-        machinesApi.list({ limit: 6 }),
-        machinesApi.list({ status: 'active', limit: 20 }),
         trialRequestsApi.list('pending'),
+        machinesApi.list({ status: 'active', limit: 100 }),
       ]);
       if (sRes.ok) setStats(sRes.data.stats);
-      if (mRes.ok) setRecent(mRes.data.machines || []);
       if (tRes.ok) setTrialReqs(tRes.data.requests || []);
       if (eRes.ok) {
         const now = Date.now();
         const soon = (eRes.data.machines || []).filter(m =>
-          !m.is_permanent && m.license_expiry && m.license_expiry - now < 7 * 86400000 && m.license_expiry > now
-        );
+          !m.is_permanent && m.license_expiry &&
+          m.license_expiry > now &&
+          m.license_expiry - now <= 7 * 86400000
+        ).sort((a, b) => a.license_expiry - b.license_expiry).slice(0, 5);
         setExpiring(soon);
       }
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }
 
   useEffect(() => { load(); }, []);
 
-  async function handleTrialAction(id, action) {
-    setActionLoading(id + action);
-    try {
-      const { ok, data } = action === 'approve'
-        ? await trialRequestsApi.approve(id)
-        : await trialRequestsApi.reject(id);
-      if (ok) {
-        setTrialReqs(prev => prev.filter(r => r.id !== id));
-        load(); // refresh stats
-      }
-    } finally {
-      setActionLoading(null);
-    }
+  function showToast(msg, type = 'success') {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
   }
 
-  if (loading) return (
+  async function handleTrialAction(id, action) {
+    setActioning(id + action);
+    try {
+      const fn = action === 'approve' ? trialRequestsApi.approve : trialRequestsApi.reject;
+      const { ok } = await fn(id);
+      if (ok) {
+        showToast(action === 'approve' ? '✅ Trial approved!' : '❌ Request rejected.');
+        setTrialReqs(p => p.filter(r => r.id !== id));
+        load();
+      }
+    } finally { setActioning(null); }
+  }
+
+  if (loading && !stats) return (
     <div className="flex items-center justify-center h-full">
-      <div className="text-center">
-        <div className="w-10 h-10 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-slate-400 text-sm">Loading dashboard...</p>
-      </div>
+      <div className="w-10 h-10 border-2 border-sky-200 border-t-sky-500 rounded-full animate-spin" />
     </div>
   );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto animate-in">
+    <div className="p-6 max-w-7xl mx-auto">
+      {toast && (
+        <div className={`fixed top-5 right-5 z-50 px-5 py-3 rounded-xl shadow-xl text-sm font-medium border ${
+          toast.type === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+        }`}>{toast.msg}</div>
+      )}
+
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-7">
         <div>
-          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-          <p className="text-slate-400 text-sm mt-0.5">PharmaPlus license management overview</p>
+          <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
+          <p className="text-sm text-slate-500 mt-0.5">PharmaPlus license management overview</p>
         </div>
-        <button
-          onClick={load}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-300 hover:bg-slate-700 transition-colors"
-        >
-          <RefreshCw size={15} />
+        <button onClick={load} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-600 hover:bg-slate-50 shadow-sm transition-colors">
+          <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           Refresh
         </button>
       </div>
 
-      {/* Stats Grid */}
-      {stats && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <StatCard icon={Monitor}       label="Total Machines"  value={stats.total}         color="blue"   onClick={() => navigate('/machines')} />
-          <StatCard icon={CheckCircle2}  label="Active"          value={stats.active}        color="green"  onClick={() => navigate('/machines?status=active')} />
-          <StatCard icon={Clock}         label="Trial"           value={stats.trial}         color="purple" onClick={() => navigate('/machines?status=trial')} />
-          <StatCard icon={ShieldOff}     label="Revoked"         value={stats.revoked}       color="red"    onClick={() => navigate('/machines?status=revoked')} />
-          <StatCard icon={AlertTriangle} label="Expiring (7d)"   value={stats.expiring_soon} color="amber"  sub="Needs renewal soon" />
-          <StatCard icon={Activity}      label="Active (24h)"    value={stats.active_24h}    color="blue"   sub="Opened app today" />
-          <StatCard icon={UserPlus}      label="New (7 days)"    value={stats.recent_reg_7d} color="green"  sub="Fresh installs" />
-          <StatCard icon={Bell}          label="Trial Requests"  value={stats.pending_trial_requests ?? 0} color="amber" sub="Pending approval" />
+      {/* ── FREE TRIAL SECTION ─────────────────────────────────────────────── */}
+      <SectionLabel icon={Gift} label="Free Trial" color="emerald" />
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <StatCard label="Pending Requests" value={stats?.pending_trial_requests ?? 0}
+          color="amber" icon={Bell} onClick={() => navigate('/trial-requests')}
+          urgent={stats?.pending_trial_requests > 0} />
+        <StatCard label="Active Trials" value={stats?.trial ?? 0}
+          color="emerald" icon={CheckCircle2} onClick={() => navigate('/trial-approved')} />
+        <StatCard label="Expired Trials" value={0}
+          color="slate" icon={Clock} onClick={() => navigate('/trial-expired')} />
+        <StatCard label="New (7 days)" value={stats?.recent_reg_7d ?? 0}
+          color="sky" icon={TrendingUp} sub="Fresh installs" />
+      </div>
+
+      {/* Pending Requests panel */}
+      {trialReqs.length > 0 && (
+        <div className="bg-white border border-amber-200 rounded-2xl mb-6 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-amber-100 bg-amber-50/60">
+            <h3 className="text-sm font-bold text-amber-800 flex items-center gap-2">
+              <Bell size={15} className="text-amber-500" />
+              {trialReqs.length} Pending Trial Request{trialReqs.length > 1 ? 's' : ''}
+            </h3>
+            <button onClick={() => navigate('/trial-requests')} className="text-xs text-amber-600 font-semibold hover:text-amber-700">
+              View All →
+            </button>
+          </div>
+          <div className="divide-y divide-slate-50">
+            {trialReqs.slice(0, 3).map(req => (
+              <div key={req.id} className="flex items-center gap-4 px-5 py-4">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0">
+                  <Bell size={16} className="text-amber-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-slate-800 truncate">{req.shop_name || 'Unknown Store'}</p>
+                  <div className="flex items-center gap-3 mt-0.5 text-xs text-slate-500">
+                    {req.phone && <span className="flex items-center gap-1"><Phone size={11} />{req.phone}</span>}
+                    {req.city  && <span className="flex items-center gap-1"><MapPin size={11} />{req.city}</span>}
+                    <span>{formatDistanceToNow(new Date(req.created_at), { addSuffix: true })}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button onClick={() => handleTrialAction(req.id, 'approve')} disabled={actioning !== null}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg disabled:opacity-50 transition-colors">
+                    {actioning === req.id + 'approve' ? <span className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" /> : <Check size={12} />}
+                    Approve
+                  </button>
+                  <button onClick={() => handleTrialAction(req.id, 'reject')} disabled={actioning !== null}
+                    className="p-1.5 border border-red-200 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg disabled:opacity-50 transition-colors">
+                    <X size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Recent Machines */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
-            <h2 className="text-sm font-semibold text-white">Recent Machines</h2>
-            <button onClick={() => navigate('/machines')} className="text-xs text-brand-400 hover:text-brand-300">View all →</button>
+      {/* ── LICENSE SECTION ───────────────────────────────────────────────── */}
+      <SectionLabel icon={Monitor} label="License" color="sky" />
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <StatCard label="Active Pharmacies" value={stats?.active ?? 0}
+          color="sky" icon={CheckCircle2} onClick={() => navigate('/active')} />
+        <StatCard label="Expiring Soon" value={stats?.expiring_soon ?? 0}
+          color="amber" icon={AlertTriangle} onClick={() => navigate('/expiring-soon')}
+          urgent={stats?.expiring_soon > 0} />
+        <StatCard label="Revoked" value={stats?.revoked ?? 0}
+          color="red" icon={ShieldOff} onClick={() => navigate('/revoked')} />
+        <StatCard label="Total Machines" value={stats?.total ?? 0}
+          color="slate" icon={Users} onClick={() => navigate('/all-machines')} />
+      </div>
+
+      {/* Bottom two-col */}
+      <div className="grid lg:grid-cols-2 gap-5">
+        {/* Expiring Soon */}
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+            <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
+              <AlertTriangle size={15} className="text-amber-500" />
+              Expiring Within 7 Days
+            </h3>
+            <button onClick={() => navigate('/expiring-soon')} className="text-xs text-sky-600 font-semibold hover:text-sky-700 flex items-center gap-0.5">
+              View All <ChevronRight size={13} />
+            </button>
           </div>
-          <div className="divide-y divide-slate-800/60">
-            {recent.length === 0 && (
-              <p className="text-slate-500 text-sm p-5">No machines registered yet.</p>
-            )}
-            {recent.map(m => (
-              <div
-                key={m.hwid}
-                onClick={() => navigate(`/machines/${encodeURIComponent(m.hwid)}`)}
-                className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-800/40 cursor-pointer transition-colors"
-              >
-                <div className="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center flex-shrink-0">
-                  <Monitor size={16} className="text-slate-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">{m.shop_name}</p>
-                  <p className="text-xs text-slate-500 truncate font-mono">{m.hwid?.slice(0, 20)}...</p>
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                  <Badge status={m.status} />
-                  {m.last_seen && (
-                    <p className="text-xs text-slate-600">
-                      {formatDistanceToNow(new Date(m.last_seen), { addSuffix: true })}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+          {expiring.length === 0 ? (
+            <div className="flex flex-col items-center py-10 text-center px-5">
+              <CheckCircle2 size={24} className="text-emerald-400 mb-2" />
+              <p className="text-sm font-medium text-slate-600">All clear!</p>
+              <p className="text-xs text-slate-400">No licenses expiring soon.</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-50">
+              {expiring.map(m => {
+                const d = Math.ceil((m.license_expiry - Date.now()) / 86400000);
+                return (
+                  <div key={m.hwid} onClick={() => navigate(`/machines/${encodeURIComponent(m.hwid)}`)}
+                    className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 cursor-pointer transition-colors">
+                    <div className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center flex-shrink-0 font-bold text-xs ${
+                      d <= 2 ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-amber-50 text-amber-600 border border-amber-200'
+                    }`}>
+                      <span className="text-base leading-none">{d}</span>
+                      <span>days</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-800 truncate">{m.shop_name}</p>
+                      <p className="text-xs text-slate-400 truncate">{m.phone || m.city || '—'}</p>
+                    </div>
+                    <ChevronRight size={15} className="text-slate-300 flex-shrink-0" />
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {/* Expiring Soon */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
-            <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-              <AlertTriangle size={15} className="text-amber-400" />
-              Expiring Soon
-            </h2>
-            <span className="text-xs bg-amber-500/15 border border-amber-500/30 text-amber-400 px-2 py-0.5 rounded-full">
-              {expiring.length} stores
-            </span>
+        {/* Quick Stats */}
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100">
+            <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
+              <Activity size={15} className="text-sky-500" />
+              Quick Stats
+            </h3>
           </div>
-          <div className="divide-y divide-slate-800/60">
-            {expiring.length === 0 && (
-              <p className="text-slate-500 text-sm p-5">No licenses expiring within 7 days.</p>
-            )}
-            {expiring.map(m => {
-              const daysLeft = Math.ceil((m.license_expiry - Date.now()) / 86400000);
-              return (
-                <div
-                  key={m.hwid}
-                  onClick={() => navigate(`/machines/${encodeURIComponent(m.hwid)}`)}
-                  className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-800/40 cursor-pointer transition-colors"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
-                    <Clock size={16} className="text-amber-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{m.shop_name}</p>
-                    <p className="text-xs text-slate-500">{m.city || 'Unknown city'}</p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className={`text-sm font-bold ${daysLeft <= 2 ? 'text-red-400' : 'text-amber-400'}`}>
-                      {daysLeft}d left
-                    </p>
-                    <button
-                      onClick={e => { e.stopPropagation(); navigate(`/machines/${encodeURIComponent(m.hwid)}`); }}
-                      className="text-xs text-brand-400 hover:text-brand-300 flex items-center gap-1 mt-0.5"
-                    >
-                      <Eye size={11} /> Renew
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="p-5 space-y-3">
+            {[
+              { label: 'Active in last 24 hours', value: stats?.active_24h ?? 0, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+              { label: 'New registrations (7d)',  value: stats?.recent_reg_7d ?? 0, color: 'text-sky-600', bg: 'bg-sky-50' },
+              { label: 'Inactive machines',       value: stats?.inactive ?? 0, color: 'text-slate-600', bg: 'bg-slate-100' },
+              { label: 'Total machines ever',     value: stats?.total ?? 0, color: 'text-sky-700', bg: 'bg-sky-50' },
+            ].map(({ label, value, color, bg }) => (
+              <div key={label} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span className="text-sm text-slate-600">{label}</span>
+                <span className={`text-lg font-bold ${color} ${bg} px-3 py-0.5 rounded-lg`}>{value}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* ── Trial Requests Panel ── */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl mt-6">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
-          <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-            <Bell size={15} className="text-amber-400" />
-            Pending Trial Requests
-            {trialReqs.length > 0 && (
-              <span className="bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                {trialReqs.length}
-              </span>
-            )}
-          </h2>
-          <button onClick={load} className="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1">
-            <RefreshCw size={12} /> Refresh
-          </button>
+function SectionLabel({ icon: Icon, label, color }) {
+  const c = { emerald: 'text-emerald-600 border-emerald-200 bg-emerald-50', sky: 'text-sky-600 border-sky-200 bg-sky-50' };
+  return (
+    <div className={`flex items-center gap-2 mb-3 px-3 py-1.5 rounded-xl border w-fit ${c[color]}`}>
+      <Icon size={14} />
+      <span className="text-xs font-bold uppercase tracking-wider">{label}</span>
+    </div>
+  );
+}
+
+function StatCard({ label, value, color, icon: Icon, onClick, sub, urgent }) {
+  const colors = {
+    sky:     { bg: 'bg-sky-50',     border: 'border-sky-200',     icon: 'text-sky-500',     val: 'text-sky-700'     },
+    emerald: { bg: 'bg-emerald-50', border: 'border-emerald-200', icon: 'text-emerald-500', val: 'text-emerald-700' },
+    amber:   { bg: 'bg-amber-50',   border: 'border-amber-200',   icon: 'text-amber-500',   val: 'text-amber-700'   },
+    red:     { bg: 'bg-red-50',     border: 'border-red-200',     icon: 'text-red-500',     val: 'text-red-700'     },
+    slate:   { bg: 'bg-slate-50',   border: 'border-slate-200',   icon: 'text-slate-500',   val: 'text-slate-700'   },
+  };
+  const c = colors[color] || colors.slate;
+  return (
+    <div onClick={onClick} className={`bg-white border rounded-2xl p-5 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all ${
+      urgent ? 'border-amber-300 bg-amber-50/30' : 'border-slate-200'
+    }`}>
+      <div className="flex items-start justify-between mb-3">
+        <div className={`w-9 h-9 rounded-xl border flex items-center justify-center ${c.bg} ${c.border}`}>
+          <Icon size={17} className={c.icon} />
         </div>
-
-        {trialReqs.length === 0 ? (
-          <div className="text-center py-10">
-            <Bell size={28} className="text-slate-700 mx-auto mb-2" />
-            <p className="text-slate-500 text-sm">No pending trial requests.</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-slate-800/60">
-            {trialReqs.map(req => (
-              <div key={req.id} className="flex items-center gap-4 px-5 py-4">
-                {/* Store icon */}
-                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
-                  <Bell size={18} className="text-amber-400" />
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-semibold text-white truncate">{req.shop_name || 'Unknown Store'}</p>
-                    <span className="text-xs bg-amber-500/15 border border-amber-500/30 text-amber-400 px-2 py-0.5 rounded-full">
-                      7-day trial
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-                    <span className="flex items-center gap-1 text-xs text-slate-400">
-                      <Phone size={11} /> {req.phone}
-                    </span>
-                    <span className="text-xs text-slate-600 font-mono">
-                      {req.hwid?.slice(0, 18)}...
-                    </span>
-                    <span className="text-xs text-slate-600">
-                      {formatDistanceToNow(new Date(req.created_at), { addSuffix: true })}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => handleTrialAction(req.id, 'approve')}
-                    disabled={actionLoading !== null}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-semibold transition-colors"
-                  >
-                    {actionLoading === req.id + 'approve' ? (
-                      <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : <Check size={13} />}
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => handleTrialAction(req.id, 'reject')}
-                    disabled={actionLoading !== null}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 disabled:opacity-50 text-red-400 text-xs font-semibold transition-colors"
-                  >
-                    {actionLoading === req.id + 'reject' ? (
-                      <span className="w-3.5 h-3.5 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
-                    ) : <X size={13} />}
-                    Reject
-                  </button>
-                  <button
-                    onClick={() => navigate(`/machines/${encodeURIComponent(req.hwid)}`)}
-                    className="p-2 rounded-lg border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-                    title="View machine"
-                  >
-                    <Eye size={14} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+        {urgent && value > 0 && (
+          <span className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse" />
         )}
       </div>
+      <p className={`text-3xl font-bold ${c.val}`}>{value}</p>
+      <p className="text-xs text-slate-500 mt-1 font-medium">{label}</p>
+      {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
     </div>
   );
 }
