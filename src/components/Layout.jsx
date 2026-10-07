@@ -149,24 +149,24 @@ export default function Layout() {
 
         {/* User footer */}
         <div className="border-t border-slate-200 p-3">
-          {/* MA Dev Studio branding */}
-          {!collapsed && (
-            <div className="flex items-center gap-2 mb-2 px-1">
-              <img src="/logo/madevstudio.png" alt="MA Dev Studio" className="h-5 object-contain opacity-60" />
-            </div>
-          )}
           {!collapsed ? (
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
-                {email?.[0]?.toUpperCase() || 'A'}
+            <div className="space-y-2">
+              {/* MA Dev Studio branding */}
+              <div className="flex items-center justify-center py-1">
+                <img src="/logo/madevstudio.png" alt="MA Dev Studio" className="h-6 object-contain opacity-70" />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-slate-700 truncate">{email}</p>
-                <p className="text-xs text-slate-400">Admin</p>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                  {email?.[0]?.toUpperCase() || 'A'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-slate-700 truncate">{email}</p>
+                  <p className="text-xs text-slate-400">Admin</p>
+                </div>
+                <button onClick={handleLogout} title="Logout" className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors">
+                  <LogOut size={15} />
+                </button>
               </div>
-              <button onClick={handleLogout} title="Logout" className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors">
-                <LogOut size={15} />
-              </button>
             </div>
           ) : (
             <button onClick={handleLogout} title="Logout" className="w-full flex justify-center p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors">
