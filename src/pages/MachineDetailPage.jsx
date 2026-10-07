@@ -178,7 +178,7 @@ export default function MachineDetailPage() {
   const isExpired = daysLeft !== null && daysLeft < 0;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto animate-in">
+    <div className="p-6 max-w-6xl mx-auto animate-in bg-slate-950 min-h-screen">
       {/* Toast */}
       {toast && (
         <div className={`fixed top-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-2xl border animate-in text-sm font-medium ${
