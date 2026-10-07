@@ -145,10 +145,6 @@ export default function Layout() {
         <div className="border-t border-slate-200 p-3">
           {!collapsed ? (
             <div className="space-y-2">
-              {/* MA Dev Studio branding */}
-              <div className="flex items-center justify-center py-1">
-                <img src="/logo/madevstudio.png" alt="MA Dev Studio" className="h-6 object-contain opacity-70" />
-              </div>
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
                   {email?.[0]?.toUpperCase() || 'A'}
