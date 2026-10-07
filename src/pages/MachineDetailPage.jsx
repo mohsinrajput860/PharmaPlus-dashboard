@@ -373,12 +373,14 @@ export default function MachineDetailPage() {
               ) : (
                 <div className="space-y-2.5">
                   {logs.map(log => (
-                    <div key={log.id} className={`flex items-start gap-3 p-3 rounded-lg border text-xs ${LOG_COLORS[log.action] || LOG_COLORS.registered}`}>
-                      <span className="font-semibold capitalize w-20 flex-shrink-0 mt-0.5">{log.action}</span>
-                      <span className="flex-1 min-w-0 text-slate-300 break-words">{log.detail}</span>
-                      <span className="text-slate-500 flex-shrink-0 text-right whitespace-nowrap ml-2">
-                        {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
-                      </span>
+                    <div key={log.id} className={`p-3 rounded-lg border text-xs ${LOG_COLORS[log.action] || LOG_COLORS.registered}`}>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="font-semibold capitalize">{log.action}</span>
+                        <span className="text-slate-500 whitespace-nowrap text-right">
+                          {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
+                        </span>
+                      </div>
+                      <span className="text-slate-300 break-words block">{log.detail}</span>
                     </div>
                   ))}
                 </div>

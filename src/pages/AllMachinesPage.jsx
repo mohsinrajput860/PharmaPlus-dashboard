@@ -45,12 +45,12 @@ export default function AllMachinesPage() {
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, HWID, owner, city..."
             className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20" />
         </div>
-        {/* Status filter — scrollable on mobile */}
-        <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 overflow-x-auto">
+        {/* Status filter — wrap on mobile */}
+        <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 flex-wrap">
           <Filter size={13} className="text-slate-400 ml-1.5 flex-shrink-0" />
           {STATUS_OPTS.map(s => (
             <button key={s} onClick={() => setStatus(s)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${
                 status === s ? 'bg-sky-500 text-white' : 'text-slate-500 hover:bg-slate-50'
               }`}>
               {s}

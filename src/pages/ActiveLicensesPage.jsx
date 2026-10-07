@@ -46,8 +46,8 @@ export default function ActiveLicensesPage() {
         </span>
       </PageHeader>
 
-      {/* Summary cards — 1 col mobile, 3 col sm+ */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+      {/* Summary cards — always 3 columns */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-5">
         <SummaryCard icon={Monitor}  label="Total Active"   value={machines.length} color="sky" />
         <SummaryCard icon={Infinity} label="Permanent"      value={permanent}        color="emerald" />
         <SummaryCard icon={Clock}    label="Timed License"  value={timed}            color="amber" />
@@ -196,13 +196,13 @@ function SummaryCard({ icon: Icon, label, value, color }) {
     amber:   'bg-amber-50 border-amber-200 text-amber-600',
   };
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3">
-      <div className={`w-10 h-10 rounded-xl border flex items-center justify-center flex-shrink-0 ${c[color]}`}>
-        <Icon size={18} />
+    <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col items-center gap-2 text-center">
+      <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl border flex items-center justify-center flex-shrink-0 ${c[color]}`}>
+        <Icon size={16} />
       </div>
-      <div>
-        <p className="text-xs text-slate-500">{label}</p>
-        <p className="text-2xl font-bold text-slate-800">{value}</p>
+      <div className="min-w-0 w-full">
+        <p className="text-xs text-slate-500 leading-tight truncate">{label}</p>
+        <p className="text-xl sm:text-2xl font-bold text-slate-800">{value}</p>
       </div>
     </div>
   );
