@@ -64,11 +64,11 @@ export default function Layout() {
       <aside className={`${collapsed ? 'w-16' : 'w-64'} flex-shrink-0 bg-white border-r border-slate-200 flex flex-col transition-all duration-300 shadow-sm`}>
 
         {/* Logo */}
-        <div className="flex items-center justify-between px-4 h-20 border-b border-slate-200">
+        <div className="flex items-center justify-between px-4 h-44 border-b border-slate-200">
           {collapsed ? (
             <img src="/logo/pharmapluslogo.png" alt="PharmaPlus" className="w-10 h-10 object-contain" />
           ) : (
-            <img src="/nameimage/pharmaplus.png" alt="PharmaPlus" className="h-14 w-auto object-contain flex-1" />
+            <img src="/nameimage/pharmaplus.png" alt="PharmaPlus" className="h-40 w-auto object-contain flex-1" />
           )}
           <button
             onClick={() => setCollapsed(p => !p)}
