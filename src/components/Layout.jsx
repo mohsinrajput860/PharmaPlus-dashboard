@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import {
   LayoutDashboard, LogOut, ChevronLeft, ChevronRight,
   Bell, CheckCircle2, Clock, ShieldOff,
-  Monitor, AlertTriangle, Users, ShieldCheck,
+  Monitor, AlertTriangle, Users,
   Gift, ChevronDown, ChevronUp
 } from 'lucide-react';
 
@@ -65,18 +65,19 @@ export default function Layout() {
 
         {/* Logo */}
         <div className="flex items-center gap-3 px-4 h-16 border-b border-slate-200">
-          <div className="w-8 h-8 flex-shrink-0 rounded-xl bg-gradient-to-br from-emerald-500 to-sky-500 flex items-center justify-center">
-            <ShieldCheck size={17} className="text-white" />
-          </div>
+          {collapsed ? (
+            <img src="/logo/pharmapluslogo.png" alt="PharmaPlus" className="w-8 h-8 object-contain flex-shrink-0" />
+          ) : (
+            <img src="/nameimage/pharmaplus.png" alt="PharmaPlus" className="h-8 object-contain flex-shrink-0" />
+          )}
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-slate-800 truncate">PharmaPlus</p>
               <p className="text-xs text-slate-400">Developer Panel</p>
             </div>
           )}
           <button
             onClick={() => setCollapsed(p => !p)}
-            className="ml-auto p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+            className="ml-auto p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0"
           >
             {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
           </button>
@@ -143,6 +144,12 @@ export default function Layout() {
 
         {/* User footer */}
         <div className="border-t border-slate-200 p-3">
+          {/* MA Dev Studio branding */}
+          {!collapsed && (
+            <div className="flex items-center gap-2 mb-2 px-1">
+              <img src="/logo/madevstudio.png" alt="MA Dev Studio" className="h-5 object-contain opacity-60" />
+            </div>
+          )}
           {!collapsed ? (
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-xs font-bold flex-shrink-0">

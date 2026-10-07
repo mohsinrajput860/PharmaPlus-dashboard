@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { ShieldCheck, Eye, EyeOff, Lock, Mail, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const { login, loading } = useAuth();
@@ -38,8 +38,8 @@ export default function LoginPage() {
       <div className="relative w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-600/20 border border-brand-500/30 mb-4 glow-blue">
-            <ShieldCheck size={32} className="text-brand-400" />
+          <div className="flex justify-center mb-4">
+            <img src="/logo/pharmapluslogo.png" alt="PharmaPlus" className="w-16 h-16 object-contain" />
           </div>
           <h1 className="text-2xl font-bold text-white">PharmaPlus</h1>
           <p className="text-slate-400 text-sm mt-1">Developer Panel — Secure Access</p>
@@ -113,9 +113,9 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-xs text-slate-600 mt-6">
-          PharmaPlus Developer Panel · MadevStudio
-        </p>
+        <div className="text-center mt-6 flex items-center justify-center gap-2 opacity-50">
+          <img src="/logo/madevstudio.png" alt="MA Dev Studio" className="h-5 object-contain" />
+        </div>
       </div>
     </div>
   );
