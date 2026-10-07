@@ -64,20 +64,15 @@ export default function Layout() {
       <aside className={`${collapsed ? 'w-16' : 'w-64'} flex-shrink-0 bg-white border-r border-slate-200 flex flex-col transition-all duration-300 shadow-sm`}>
 
         {/* Logo */}
-        <div className="flex items-center gap-3 px-4 h-16 border-b border-slate-200">
+        <div className="flex items-center justify-between px-4 h-16 border-b border-slate-200">
           {collapsed ? (
-            <img src="/logo/pharmapluslogo.png" alt="PharmaPlus" className="w-8 h-8 object-contain flex-shrink-0" />
+            <img src="/logo/pharmapluslogo.png" alt="PharmaPlus" className="w-9 h-9 object-contain" />
           ) : (
-            <img src="/nameimage/pharmaplus.png" alt="PharmaPlus" className="h-8 object-contain flex-shrink-0" />
-          )}
-          {!collapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-slate-400">Developer Panel</p>
-            </div>
+            <img src="/nameimage/pharmaplus.png" alt="PharmaPlus" className="h-9 object-contain" />
           )}
           <button
             onClick={() => setCollapsed(p => !p)}
-            className="ml-auto p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0"
           >
             {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
           </button>
