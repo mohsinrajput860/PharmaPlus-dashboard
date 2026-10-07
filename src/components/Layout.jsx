@@ -68,7 +68,7 @@ export default function Layout() {
           {collapsed ? (
             <img src="/logo/pharmapluslogo.png" alt="PharmaPlus" className="w-9 h-9 object-contain" />
           ) : (
-            <img src="/nameimage/pharmaplus.png" alt="PharmaPlus" className="h-9 object-contain" />
+            <img src="/nameimage/pharmaplus.png" alt="PharmaPlus" className="h-12 w-auto object-contain" />
           )}
           <button
             onClick={() => setCollapsed(p => !p)}
