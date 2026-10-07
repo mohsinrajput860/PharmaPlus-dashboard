@@ -27,9 +27,9 @@ export default function ApprovedTrialsPage() {
   );
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-5xl mx-auto">
       <PageHeader icon={CheckCircle2} title="Approved Trials" subtitle="Pharmacies currently on 7-day free trial" color="emerald" onRefresh={load} loading={loading}>
-        <span className="text-sm font-semibold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <span className="text-xs sm:text-sm font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap">
           {machines.length} Active
         </span>
       </PageHeader>

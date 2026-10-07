@@ -40,7 +40,7 @@ export default function TrialRequestsPage() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-5xl mx-auto">
       {/* Toast */}
       {toast && (
         <div className={`fixed top-5 right-5 z-50 px-5 py-3 rounded-xl shadow-xl text-sm font-medium border ${
@@ -58,7 +58,7 @@ export default function TrialRequestsPage() {
         onRefresh={load}
         loading={loading}
       >
-        <span className={`text-sm font-semibold px-3 py-1.5 rounded-full ${
+        <span className={`text-xs sm:text-sm font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${
           requests.length > 0
             ? 'bg-amber-50 text-amber-700 border border-amber-200'
             : 'bg-slate-100 text-slate-500 border border-slate-200'
@@ -119,11 +119,11 @@ export default function TrialRequestsPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                 <button
                   onClick={() => handleAction(req.id, req.hwid, 'approve')}
                   disabled={actioning !== null}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
+                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
                 >
                   {actioning === req.id + 'approve'
                     ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -133,7 +133,7 @@ export default function TrialRequestsPage() {
                 <button
                   onClick={() => handleAction(req.id, req.hwid, 'reject')}
                   disabled={actioning !== null}
-                  className="flex items-center gap-2 px-4 py-2.5 border border-red-200 bg-red-50 hover:bg-red-100 disabled:opacity-50 text-red-600 text-sm font-semibold rounded-xl transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 border border-red-200 bg-red-50 hover:bg-red-100 disabled:opacity-50 text-red-600 text-sm font-semibold rounded-xl transition-colors"
                 >
                   {actioning === req.id + 'reject'
                     ? <span className="w-4 h-4 border-2 border-red-300 border-t-red-600 rounded-full animate-spin" />
