@@ -16,11 +16,9 @@ export default function ExpiredTrialsPage() {
   async function load() {
     setLoading(true);
     try {
-      // inactive machines that previously had a trial (license_expiry set but now expired)
       const { ok, data } = await machinesApi.list({ status: 'inactive', limit: 200 });
       if (ok) {
         const now = Date.now();
-        // Filter: had expiry date (were on trial/license) but now inactive/expired
         const expired = (data.machines || []).filter(m => m.license_expiry && m.license_expiry < now);
         setMachines(expired);
       }
@@ -49,7 +47,7 @@ export default function ExpiredTrialsPage() {
   );
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-5xl mx-auto">
       {toast && (
         <div className={`fixed top-5 right-5 z-50 px-5 py-3 rounded-xl shadow-xl text-sm font-medium border ${
           toast.type === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
@@ -85,15 +83,16 @@ export default function ExpiredTrialsPage() {
           {filtered.map(m => {
             const expiredAgo = formatDistanceToNow(new Date(m.license_expiry), { addSuffix: true });
             return (
-              <div key={m.hwid} className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-md transition-all">
-                <div className="flex items-start gap-4">
+              <div key={m.hwid} className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 hover:shadow-md transition-all">
+                <div className="flex items-start gap-3 sm:gap-4">
                   <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0">
                     <Store size={20} className="text-amber-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div>
-                        <p className="font-bold text-slate-800">{m.shop_name}</p>
+                    {/* Name + expired badge — wrap on mobile */}
+                    <div className="flex flex-wrap items-start gap-2 mb-2">
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-800 break-words">{m.shop_name}</p>
                         {m.owner_name && <p className="text-xs text-slate-500 mt-0.5">{m.owner_name}</p>}
                       </div>
                       <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-red-50 text-red-600 border border-red-200 flex-shrink-0 whitespace-nowrap">
@@ -107,13 +106,12 @@ export default function ExpiredTrialsPage() {
                     <div className="bg-slate-50 rounded-lg px-3 py-1.5 mb-3">
                       <code className="text-xs text-slate-500 font-mono break-all">{m.hwid}</code>
                     </div>
-                    {/* Convert to license actions */}
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs text-slate-400 font-medium">Convert to license:</span>
                       {[30, 90, 365].map(d => (
                         <button key={d} onClick={() => handleAuthorize(m.hwid, d)} disabled={actioning === m.hwid}
                           className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-700 disabled:opacity-50 transition-colors">
-                          {actioning === m.hwid ? '...' : `${d === 365 ? '1 Year' : d + 'd'}`}
+                          {actioning === m.hwid ? '...' : d === 365 ? '1yr' : `${d}d`}
                         </button>
                       ))}
                       <button onClick={() => navigate(`/machines/${encodeURIComponent(m.hwid)}`)} className="ml-auto text-xs text-sky-600 hover:text-sky-700 font-medium">

@@ -66,7 +66,7 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
       {toast && (
         <div className={`fixed top-5 right-5 z-50 px-5 py-3 rounded-xl shadow-xl text-sm font-medium border ${
           toast.type === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
@@ -74,21 +74,21 @@ export default function DashboardPage() {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-7">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
-          <p className="text-sm text-slate-500 mt-0.5">PharmaPlus license management overview</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Dashboard</h1>
+          <p className="text-sm text-slate-500 mt-0.5">PharmaPlus license management</p>
         </div>
-        <button onClick={load} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-600 hover:bg-slate-50 shadow-sm transition-colors">
+        <button onClick={load} className="flex items-center gap-2 px-3 py-2 sm:px-4 rounded-xl border border-slate-200 bg-white text-sm text-slate-600 hover:bg-slate-50 shadow-sm transition-colors">
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-          Refresh
+          <span className="hidden sm:inline">Refresh</span>
         </button>
       </div>
 
       {/* ── FREE TRIAL SECTION ─────────────────────────────────────────────── */}
       <SectionLabel icon={Gift} label="Free Trial" color="emerald" />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
         <StatCard label="Pending Requests" value={stats?.pending_trial_requests ?? 0}
           color="amber" icon={Bell} onClick={() => navigate('/trial-requests')}
           urgent={stats?.pending_trial_requests > 0} />
@@ -103,10 +103,10 @@ export default function DashboardPage() {
       {/* Pending Requests panel */}
       {trialReqs.length > 0 && (
         <div className="bg-white border border-amber-200 rounded-2xl mb-6 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-amber-100 bg-amber-50/60">
+          <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b border-amber-100 bg-amber-50/60">
             <h3 className="text-sm font-bold text-amber-800 flex items-center gap-2">
               <Bell size={15} className="text-amber-500" />
-              {trialReqs.length} Pending Trial Request{trialReqs.length > 1 ? 's' : ''}
+              {trialReqs.length} Pending Request{trialReqs.length > 1 ? 's' : ''}
             </h3>
             <button onClick={() => navigate('/trial-requests')} className="text-xs text-amber-600 font-semibold hover:text-amber-700">
               View All →
@@ -114,27 +114,30 @@ export default function DashboardPage() {
           </div>
           <div className="divide-y divide-slate-50">
             {trialReqs.slice(0, 3).map(req => (
-              <div key={req.id} className="flex items-center gap-4 px-5 py-4">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0">
-                  <Bell size={16} className="text-amber-500" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-800 truncate">{req.shop_name || 'Unknown Store'}</p>
-                  <div className="flex items-center gap-3 mt-0.5 text-xs text-slate-500">
-                    {req.phone && <span className="flex items-center gap-1"><Phone size={11} />{req.phone}</span>}
-                    {req.city  && <span className="flex items-center gap-1"><MapPin size={11} />{req.city}</span>}
-                    <span>{formatDistanceToNow(new Date(req.created_at), { addSuffix: true })}</span>
+              <div key={req.id} className="px-4 sm:px-5 py-3 sm:py-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0">
+                    <Bell size={16} className="text-amber-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-slate-800 truncate">{req.shop_name || 'Unknown Store'}</p>
+                    <div className="flex flex-wrap items-center gap-2 mt-0.5 text-xs text-slate-500">
+                      {req.phone && <span className="flex items-center gap-1"><Phone size={11} />{req.phone}</span>}
+                      {req.city  && <span className="flex items-center gap-1"><MapPin size={11} />{req.city}</span>}
+                      <span>{formatDistanceToNow(new Date(req.created_at), { addSuffix: true })}</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
+                {/* Action buttons on separate row on mobile */}
+                <div className="flex items-center gap-2 mt-3 ml-12">
                   <button onClick={() => handleTrialAction(req.id, 'approve')} disabled={actioning !== null}
                     className="flex items-center gap-1 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg disabled:opacity-50 transition-colors">
                     {actioning === req.id + 'approve' ? <span className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" /> : <Check size={12} />}
                     Approve
                   </button>
                   <button onClick={() => handleTrialAction(req.id, 'reject')} disabled={actioning !== null}
-                    className="p-1.5 border border-red-200 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg disabled:opacity-50 transition-colors">
-                    <X size={14} />
+                    className="flex items-center gap-1 px-3 py-1.5 border border-red-200 bg-red-50 hover:bg-red-100 text-red-500 text-xs font-semibold rounded-lg disabled:opacity-50 transition-colors">
+                    <X size={12} /> Reject
                   </button>
                 </div>
               </div>
@@ -146,7 +149,7 @@ export default function DashboardPage() {
       {/* ── LICENSE SECTION ───────────────────────────────────────────────── */}
       <SectionLabel icon={Monitor} label="License" color="sky" />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
         <StatCard label="Active Pharmacies" value={stats?.active ?? 0}
           color="sky" icon={CheckCircle2} onClick={() => navigate('/active')} />
         <StatCard label="Expiring Soon" value={stats?.expiring_soon ?? 0}
@@ -162,7 +165,7 @@ export default function DashboardPage() {
       <div className="grid lg:grid-cols-2 gap-5">
         {/* Expiring Soon */}
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+          <div className="flex items-center justify-between px-4 sm:px-5 py-4 border-b border-slate-100">
             <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
               <AlertTriangle size={15} className="text-amber-500" />
               Expiring Within 7 Days
@@ -183,7 +186,7 @@ export default function DashboardPage() {
                 const d = Math.ceil((m.license_expiry - Date.now()) / 86400000);
                 return (
                   <div key={m.hwid} onClick={() => navigate(`/machines/${encodeURIComponent(m.hwid)}`)}
-                    className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 cursor-pointer transition-colors">
+                    className="flex items-center gap-3 px-4 sm:px-5 py-3.5 hover:bg-slate-50 cursor-pointer transition-colors">
                     <div className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center flex-shrink-0 font-bold text-xs ${
                       d <= 2 ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-amber-50 text-amber-600 border border-amber-200'
                     }`}>
@@ -204,13 +207,13 @@ export default function DashboardPage() {
 
         {/* Quick Stats */}
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100">
+          <div className="px-4 sm:px-5 py-4 border-b border-slate-100">
             <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
               <Activity size={15} className="text-sky-500" />
               Quick Stats
             </h3>
           </div>
-          <div className="p-5 space-y-3">
+          <div className="p-4 sm:p-5 space-y-3">
             {[
               { label: 'Active in last 24 hours', value: stats?.active_24h ?? 0, color: 'text-emerald-600', bg: 'bg-emerald-50' },
               { label: 'New registrations (7d)',  value: stats?.recent_reg_7d ?? 0, color: 'text-sky-600', bg: 'bg-sky-50' },
@@ -218,8 +221,8 @@ export default function DashboardPage() {
               { label: 'Total machines ever',     value: stats?.total ?? 0, color: 'text-sky-700', bg: 'bg-sky-50' },
             ].map(({ label, value, color, bg }) => (
               <div key={label} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-sm text-slate-600">{label}</span>
-                <span className={`text-lg font-bold ${color} ${bg} px-3 py-0.5 rounded-lg`}>{value}</span>
+                <span className="text-sm text-slate-600 truncate mr-3">{label}</span>
+                <span className={`text-lg font-bold flex-shrink-0 ${color} ${bg} px-3 py-0.5 rounded-lg`}>{value}</span>
               </div>
             ))}
           </div>
@@ -249,7 +252,7 @@ function StatCard({ label, value, color, icon: Icon, onClick, sub, urgent }) {
   };
   const c = colors[color] || colors.slate;
   return (
-    <div onClick={onClick} className={`bg-white border rounded-2xl p-5 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all ${
+    <div onClick={onClick} className={`bg-white border rounded-2xl p-4 sm:p-5 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all ${
       urgent ? 'border-amber-300 bg-amber-50/30' : 'border-slate-200'
     }`}>
       <div className="flex items-start justify-between mb-3">
@@ -260,8 +263,8 @@ function StatCard({ label, value, color, icon: Icon, onClick, sub, urgent }) {
           <span className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse" />
         )}
       </div>
-      <p className={`text-3xl font-bold ${c.val}`}>{value}</p>
-      <p className="text-xs text-slate-500 mt-1 font-medium">{label}</p>
+      <p className={`text-2xl sm:text-3xl font-bold ${c.val}`}>{value}</p>
+      <p className="text-xs text-slate-500 mt-1 font-medium leading-tight">{label}</p>
       {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
     </div>
   );

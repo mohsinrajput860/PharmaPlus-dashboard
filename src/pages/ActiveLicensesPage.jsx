@@ -10,7 +10,7 @@ export default function ActiveLicensesPage() {
   const [machines, setMachines] = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [search,   setSearch]   = useState('');
-  const [filter,   setFilter]   = useState('all'); // all | permanent | timed
+  const [filter,   setFilter]   = useState('all');
 
   async function load() {
     setLoading(true);
@@ -39,21 +39,21 @@ export default function ActiveLicensesPage() {
   const timed     = machines.filter(m => !m.is_permanent).length;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto">
       <PageHeader icon={Monitor} title="Active Pharmacies" subtitle="All pharmacies with active licenses" color="sky" onRefresh={load} loading={loading}>
         <span className="text-sm font-semibold px-3 py-1.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
           {machines.length} Active
         </span>
       </PageHeader>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-4 mb-5">
-        <SummaryCard icon={Monitor} label="Total Active" value={machines.length} color="sky" />
-        <SummaryCard icon={Infinity} label="Permanent" value={permanent} color="emerald" />
-        <SummaryCard icon={Clock} label="Timed License" value={timed} color="amber" />
+      {/* Summary cards — 1 col mobile, 3 col sm+ */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+        <SummaryCard icon={Monitor}  label="Total Active"   value={machines.length} color="sky" />
+        <SummaryCard icon={Infinity} label="Permanent"      value={permanent}        color="emerald" />
+        <SummaryCard icon={Clock}    label="Timed License"  value={timed}            color="amber" />
       </div>
 
-      {/* Filters + Search */}
+      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <div className="relative flex-1">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -63,7 +63,7 @@ export default function ActiveLicensesPage() {
         <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1">
           {['all','permanent','timed'].map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors whitespace-nowrap ${
                 filter === f ? 'bg-sky-500 text-white' : 'text-slate-500 hover:bg-slate-50'
               }`}>
               {f}
@@ -83,58 +83,107 @@ export default function ActiveLicensesPage() {
           <p className="text-sm text-slate-400 mt-1">Active licensed pharmacies will appear here.</p>
         </div>
       ) : (
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-          <table className="w-full">
-            <thead className="border-b border-slate-100">
-              <tr>
-                {['Pharmacy', 'Owner', 'Phone', 'City', 'License', 'Last Seen', ''].map(h => (
-                  <th key={h} className="text-left text-xs font-bold text-slate-400 uppercase tracking-wider px-5 py-3.5">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {filtered.map(m => {
-                const daysLeft = m.license_expiry && !m.is_permanent
-                  ? Math.ceil((m.license_expiry - Date.now()) / 86400000) : null;
-                return (
-                  <tr key={m.hwid} onClick={() => navigate(`/machines/${encodeURIComponent(m.hwid)}`)}
-                    className="hover:bg-sky-50/50 cursor-pointer transition-colors">
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-sky-50 border border-sky-100 flex items-center justify-center flex-shrink-0">
-                          <Monitor size={14} className="text-sky-500" />
-                        </div>
-                        <p className="text-sm font-semibold text-slate-800">{m.shop_name}</p>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5 text-sm text-slate-600">{m.owner_name || '—'}</td>
-                    <td className="px-5 py-3.5 text-sm text-slate-600">{m.phone || '—'}</td>
-                    <td className="px-5 py-3.5 text-sm text-slate-600">{m.city || '—'}</td>
-                    <td className="px-5 py-3.5">
-                      {m.is_permanent ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
-                          <Infinity size={11} /> Permanent
-                        </span>
-                      ) : (
-                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                          daysLeft !== null && daysLeft <= 7 ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-sky-50 text-sky-600 border border-sky-200'
-                        }`}>
-                          {daysLeft !== null ? `${daysLeft}d left` : format(new Date(m.license_expiry), 'dd MMM yy')}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-5 py-3.5 text-xs text-slate-400">
-                      {m.last_seen ? formatDistanceToNow(new Date(m.last_seen), { addSuffix: true }) : '—'}
-                    </td>
-                    <td className="px-5 py-3.5 text-right">
-                      <span className="text-xs text-sky-500 font-medium">View →</span>
-                    </td>
+        <>
+          {/* ── Desktop Table ── */}
+          <div className="hidden sm:block bg-white border border-slate-200 rounded-2xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="border-b border-slate-100">
+                  <tr>
+                    <th className="text-left text-xs font-bold text-slate-400 uppercase tracking-wider px-5 py-3.5">Pharmacy</th>
+                    <th className="text-left text-xs font-bold text-slate-400 uppercase tracking-wider px-5 py-3.5 hidden md:table-cell">Owner</th>
+                    <th className="text-left text-xs font-bold text-slate-400 uppercase tracking-wider px-5 py-3.5 hidden lg:table-cell">Phone</th>
+                    <th className="text-left text-xs font-bold text-slate-400 uppercase tracking-wider px-5 py-3.5 hidden lg:table-cell">City</th>
+                    <th className="text-left text-xs font-bold text-slate-400 uppercase tracking-wider px-5 py-3.5">License</th>
+                    <th className="text-left text-xs font-bold text-slate-400 uppercase tracking-wider px-5 py-3.5 hidden md:table-cell">Last Seen</th>
+                    <th className="px-5 py-3.5"></th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {filtered.map(m => {
+                    const daysLeft = m.license_expiry && !m.is_permanent
+                      ? Math.ceil((m.license_expiry - Date.now()) / 86400000) : null;
+                    return (
+                      <tr key={m.hwid} onClick={() => navigate(`/machines/${encodeURIComponent(m.hwid)}`)}
+                        className="hover:bg-sky-50/50 cursor-pointer transition-colors">
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-sky-50 border border-sky-100 flex items-center justify-center flex-shrink-0">
+                              <Monitor size={14} className="text-sky-500" />
+                            </div>
+                            <p className="text-sm font-semibold text-slate-800 truncate max-w-[150px]">{m.shop_name}</p>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5 text-sm text-slate-600 hidden md:table-cell">{m.owner_name || '—'}</td>
+                        <td className="px-5 py-3.5 text-sm text-slate-600 hidden lg:table-cell">{m.phone || '—'}</td>
+                        <td className="px-5 py-3.5 text-sm text-slate-600 hidden lg:table-cell">{m.city || '—'}</td>
+                        <td className="px-5 py-3.5">
+                          {m.is_permanent ? (
+                            <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
+                              <Infinity size={11} /> Permanent
+                            </span>
+                          ) : (
+                            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                              daysLeft !== null && daysLeft <= 7 ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-sky-50 text-sky-600 border border-sky-200'
+                            }`}>
+                              {daysLeft !== null ? `${daysLeft}d left` : format(new Date(m.license_expiry), 'dd MMM yy')}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-5 py-3.5 text-xs text-slate-400 hidden md:table-cell">
+                          {m.last_seen ? formatDistanceToNow(new Date(m.last_seen), { addSuffix: true }) : '—'}
+                        </td>
+                        <td className="px-5 py-3.5 text-right">
+                          <span className="text-xs text-sky-500 font-medium">View →</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* ── Mobile Card List ── */}
+          <div className="sm:hidden space-y-3">
+            {filtered.map(m => {
+              const daysLeft = m.license_expiry && !m.is_permanent
+                ? Math.ceil((m.license_expiry - Date.now()) / 86400000) : null;
+              return (
+                <div key={m.hwid} onClick={() => navigate(`/machines/${encodeURIComponent(m.hwid)}`)}
+                  className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm cursor-pointer hover:shadow-md transition-all">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-9 h-9 rounded-lg bg-sky-50 border border-sky-100 flex items-center justify-center flex-shrink-0">
+                        <Monitor size={15} className="text-sky-500" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-slate-800 truncate">{m.shop_name}</p>
+                        {m.owner_name && <p className="text-xs text-slate-500">{m.owner_name}</p>}
+                      </div>
+                    </div>
+                    {m.is_permanent ? (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex-shrink-0">
+                        <Infinity size={10} /> Perm
+                      </span>
+                    ) : daysLeft !== null ? (
+                      <span className={`text-xs font-bold px-2 py-1 rounded-full flex-shrink-0 ${
+                        daysLeft <= 7 ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-sky-50 text-sky-600 border border-sky-200'
+                      }`}>
+                        {daysLeft < 0 ? 'Expired' : `${daysLeft}d`}
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="flex flex-wrap gap-3 text-xs text-slate-500">
+                    {m.phone && <span className="flex items-center gap-1"><Phone size={11} />{m.phone}</span>}
+                    {m.city  && <span className="flex items-center gap-1"><MapPin size={11} />{m.city}</span>}
+                    {m.last_seen && <span className="flex items-center gap-1"><Clock size={11} />{formatDistanceToNow(new Date(m.last_seen), { addSuffix: true })}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );
@@ -148,7 +197,7 @@ function SummaryCard({ icon: Icon, label, value, color }) {
   };
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3">
-      <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${c[color]}`}>
+      <div className={`w-10 h-10 rounded-xl border flex items-center justify-center flex-shrink-0 ${c[color]}`}>
         <Icon size={18} />
       </div>
       <div>

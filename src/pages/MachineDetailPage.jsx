@@ -168,7 +168,7 @@ export default function MachineDetailPage() {
   const isExpired = daysLeft !== null && daysLeft < 0;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto animate-in bg-slate-950 min-h-screen">
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto animate-in bg-slate-950 min-h-screen">
       {/* Toast */}
       {toast && (
         <div className={`fixed top-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-2xl border animate-in text-sm font-medium ${
@@ -182,7 +182,7 @@ export default function MachineDetailPage() {
       )}
 
       {/* Back + Header */}
-      <div className="flex items-start gap-4 mb-8">
+      <div className="flex items-start gap-3 sm:gap-4 mb-6 sm:mb-8">
         <button onClick={() => navigate('/machines')} className="p-2 rounded-lg border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors mt-0.5">
           <ArrowLeft size={18} />
         </button>
@@ -211,7 +211,7 @@ export default function MachineDetailPage() {
         </button>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
         {/* LEFT COLUMN */}
         <div className="lg:col-span-2 space-y-6">
 
@@ -286,19 +286,19 @@ export default function MachineDetailPage() {
               <div className="flex flex-wrap gap-3 pt-2 border-t border-slate-800">
                 <button
                   onClick={() => setModal({ open: true, type: 'trial' })}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 text-sm font-medium transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 text-xs sm:text-sm font-medium transition-colors"
                 >
                   <Gift size={14} /> Grant 7-day Trial
                 </button>
                 <button
                   onClick={() => setModal({ open: true, type: 'revoke' })}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 text-sm font-medium transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 text-xs sm:text-sm font-medium transition-colors"
                 >
                   <ShieldOff size={14} /> Revoke License
                 </button>
                 <button
                   onClick={() => setModal({ open: true, type: 'delete' })}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-700 text-slate-400 hover:text-red-400 hover:border-red-500/30 text-sm font-medium transition-colors ml-auto"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-700 text-slate-400 hover:text-red-400 hover:border-red-500/30 text-xs sm:text-sm font-medium transition-colors sm:ml-auto"
                 >
                   <Trash2 size={14} /> Delete Record
                 </button>
@@ -466,7 +466,7 @@ export default function MachineDetailPage() {
             <div className="px-5 py-4 border-b border-slate-800">
               <h2 className="text-sm font-semibold text-white">Feature Summary</h2>
             </div>
-            <div className="p-4 grid grid-cols-3 gap-2">
+            <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
               {FEATURE_LIST.map(({ key, icon: Icon, label }) => (
                 <div key={key} className={`flex flex-col items-center gap-1 p-2 rounded-lg border text-center ${
                   features[key]
