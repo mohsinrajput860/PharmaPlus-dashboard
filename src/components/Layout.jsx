@@ -5,7 +5,7 @@ import {
   LayoutDashboard, LogOut, Menu, X,
   Bell, CheckCircle2, Clock, ShieldOff,
   Monitor, AlertTriangle, Users,
-  Gift, ChevronDown, ChevronUp
+  Gift, ChevronDown, ChevronUp, Tag
 } from 'lucide-react';
 
 // ── Navigation Structure ───────────────────────────────────────────────────────
@@ -35,11 +35,19 @@ const NAV = [
       { to: '/revoked',         label: 'Revoked',           icon: ShieldOff },
     ]
   },
+  {
+    section: 'Settings',
+    color: 'violet',
+    items: [
+      { to: '/pricing', label: 'Pricing & Packages', icon: Tag },
+    ]
+  },
 ];
 
 const SECTION_COLORS = {
   emerald: 'text-emerald-600',
   sky:     'text-sky-600',
+  violet:  'text-violet-600',
 };
 
 export default function Layout() {
@@ -47,7 +55,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [openSections, setOpenSections] = useState({ 'Free Trial': true, 'License': true });
+  const [openSections, setOpenSections] = useState({ 'Free Trial': true, 'License': true, 'Settings': true });
 
   function toggleSection(section) {
     setOpenSections(p => ({ ...p, [section]: !p[section] }));
@@ -140,7 +148,7 @@ export default function Layout() {
                 </ul>
               )}
 
-              {section !== 'License' && (!collapsed || mobile) && (
+              {section !== 'Settings' && (!collapsed || mobile) && (
                 <div className="my-2 border-t border-slate-100" />
               )}
             </div>

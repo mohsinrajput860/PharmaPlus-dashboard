@@ -12,6 +12,7 @@ import ActiveLicensesPage from './pages/ActiveLicensesPage.jsx';
 import ExpiringSoonPage   from './pages/ExpiringSoonPage.jsx';
 import AllMachinesPage    from './pages/AllMachinesPage.jsx';
 import RevokedPage        from './pages/RevokedPage.jsx';
+import PricingPage        from './pages/PricingPage.jsx';
 import Layout            from './components/Layout.jsx';
 
 function ProtectedRoute({ children }) {
@@ -42,6 +43,8 @@ export default function App() {
           {/* Machine detail */}
           <Route path="machines"        element={<MachinesPage />} />
           <Route path="machines/:hwid"  element={<MachineDetailPage />} />
+          {/* Pricing */}
+          <Route path="pricing"         element={<PricingPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

@@ -63,3 +63,10 @@ export const trialRequestsApi = {
   approve: (id)                 => request('POST', `/api/admin/trial-requests/${id}/approve`),
   reject:  (id)                 => request('POST', `/api/admin/trial-requests/${id}/reject`),
 };
+
+export const pricingApi = {
+  list:   ()        => request('GET',    '/api/admin/pricing'),
+  create: (data)    => request('POST',   '/api/admin/pricing', data),
+  update: (id, data)=> request('PUT',    `/api/admin/pricing/${id}`, data),
+  delete: (id)      => request('DELETE', `/api/admin/pricing/${id}`),
+};
