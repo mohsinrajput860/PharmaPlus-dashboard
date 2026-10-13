@@ -94,7 +94,7 @@ export default function DashboardPage() {
           urgent={stats?.pending_trial_requests > 0} />
         <StatCard label="Active Trials" value={stats?.trial ?? 0}
           color="emerald" icon={CheckCircle2} onClick={() => navigate('/trial-approved')} />
-        <StatCard label="Expired Trials" value={0}
+        <StatCard label="Expired Trials" value={stats?.expired_trials ?? 0}
           color="slate" icon={Clock} onClick={() => navigate('/trial-expired')} />
         <StatCard label="New (7 days)" value={stats?.recent_reg_7d ?? 0}
           color="sky" icon={TrendingUp} sub="Fresh installs" />
