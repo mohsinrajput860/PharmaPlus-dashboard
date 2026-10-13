@@ -452,6 +452,14 @@ export default function MachineDetailPage() {
                   <InfoRow icon={Activity}  label="Open Count"   value={`${machine.open_count || 0} times`} />
                   <InfoRow icon={Calendar}  label="Registered"   value={machine.created_at ? format(new Date(machine.created_at), 'dd MMM yyyy') : '—'} />
                   <InfoRow icon={Clock}     label="Last Seen"    value={machine.last_seen ? formatDistanceToNow(new Date(machine.last_seen), { addSuffix: true }) : 'Never'} />
+                  {machine.cloud_backup === 1 && (
+                    <InfoRow icon={CloudUpload} label="Backup Email"
+                      value={machine.backup_email
+                        ? <span className="text-sky-400 break-all">{machine.backup_email}</span>
+                        : <span className="text-slate-500 italic text-xs">Not connected yet</span>
+                      }
+                    />
+                  )}
                   {machine.notes && (
                     <div className="pt-2 border-t border-slate-800">
                       <p className="text-xs text-slate-500 mb-1">Notes</p>
