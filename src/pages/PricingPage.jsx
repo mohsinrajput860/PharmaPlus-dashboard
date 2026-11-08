@@ -106,8 +106,16 @@ export default function PricingPage() {
   }
 
   async function toggleActive(pkg) {
-    await pricingApi.update(pkg.id, { is_active: pkg.is_active ? 0 : 1 });
-    load();
+    setSaving(true);
+    try {
+      const { ok } = await pricingApi.update(pkg.id, { is_active: pkg.is_active ? 0 : 1 });
+      if (ok) load();
+      else showToast('Failed to update package visibility', 'error');
+    } catch {
+      showToast('Network error. Please try again.', 'error');
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (

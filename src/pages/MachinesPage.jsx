@@ -31,7 +31,8 @@ export default function MachinesPage() {
     } finally { setLoading(false); }
   }, [search, status]);
 
-  useEffect(() => { load(); }, [load]);
+  // status change → immediate load; search change → debounced load
+  useEffect(() => { load(); }, [status]);
   useEffect(() => {
     const t = setTimeout(load, 400);
     return () => clearTimeout(t);

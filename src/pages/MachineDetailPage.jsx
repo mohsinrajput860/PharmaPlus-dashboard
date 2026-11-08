@@ -8,7 +8,7 @@ import {
   ArrowLeft, Monitor, Phone, MapPin, User, Calendar, Clock,
   CheckCircle2, ShieldOff, Gift, RefreshCw, Save, Trash2,
   Activity, Hash, Smartphone, CloudUpload,
-  Users, Network,
+  Users, Network, BarChart2, ShoppingCart, Wallet, RotateCcw, Truck,
   AlertTriangle, Edit3, X, Check, Info
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
@@ -23,10 +23,15 @@ const DURATION_OPTIONS = [
 ];
 
 const FEATURE_LIST = [
-  { key: 'mobile_app',   icon: Smartphone,  label: 'Mobile App',   desc: 'Companion mobile app connectivity & QR access' },
-  { key: 'cloud_backup', icon: CloudUpload, label: 'Cloud Backup', desc: 'Google Drive automatic backup feature' },
-  { key: 'multi_user',   icon: Users,       label: 'Multi-User',   desc: 'Multiple staff accounts with permissions' },
-  { key: 'lan_sync',     icon: Network,     label: 'LAN Sync',     desc: 'Multi-desktop local network sync' },
+  { key: 'mobile_app',     icon: Smartphone,  label: 'Mobile App',    desc: 'Companion mobile app connectivity & QR access' },
+  { key: 'cloud_backup',   icon: CloudUpload, label: 'Cloud Backup',  desc: 'Google Drive automatic backup feature' },
+  { key: 'multi_user',     icon: Users,       label: 'Multi-User',    desc: 'Multiple staff accounts with permissions' },
+  { key: 'lan_sync',       icon: Network,     label: 'LAN Sync',      desc: 'Multi-desktop local network sync' },
+  { key: 'reports',        icon: BarChart2,   label: 'Reports',       desc: 'Sales analytics & profit reports' },
+  { key: 'purchases',      icon: ShoppingCart,label: 'Purchases',     desc: 'Supplier purchase order management' },
+  { key: 'expenses',       icon: Wallet,      label: 'Expenses',      desc: 'Expense tracking & management' },
+  { key: 'returns_module', icon: RotateCcw,   label: 'Returns',       desc: 'Medicine returns & exchange module' },
+  { key: 'suppliers',      icon: Truck,       label: 'Suppliers',     desc: 'Supplier directory management' },
 ];
 
 const LOG_COLORS = {
@@ -73,6 +78,11 @@ export default function MachineDetailPage() {
           cloud_backup:   data.machine.cloud_backup   ?? 1,
           multi_user:     data.machine.multi_user     ?? 1,
           lan_sync:       data.machine.lan_sync       ?? 1,
+          reports:        data.machine.reports        ?? 1,
+          purchases:      data.machine.purchases      ?? 1,
+          expenses:       data.machine.expenses       ?? 1,
+          returns_module: data.machine.returns_module ?? 1,
+          suppliers:      data.machine.suppliers      ?? 1,
         });
         setEditInfo({
           shop_name:  data.machine.shop_name  || '',

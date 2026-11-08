@@ -3,8 +3,27 @@ import { authApi } from '../api/client.js';
 
 const AuthContext = createContext(null);
 
+// Decode JWT payload without verification (client-side expiry check only)
+function jwtIsExpired(token) {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return payload.exp && (Date.now() / 1000) > payload.exp;
+  } catch {
+    return true; // malformed = treat as expired
+  }
+}
+
 export function AuthProvider({ children }) {
-  const [token, setToken]   = useState(() => localStorage.getItem('admin_token') || null);
+  const [token, setToken] = useState(() => {
+    const t = localStorage.getItem('admin_token');
+    if (t && jwtIsExpired(t)) {
+      // Clear stale token immediately on load — avoids flash of dashboard
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_email');
+      return null;
+    }
+    return t || null;
+  });
   const [email, setEmail]   = useState(() => localStorage.getItem('admin_email') || null);
   const [loading, setLoading] = useState(false);
   const [error, setError]   = useState(null);

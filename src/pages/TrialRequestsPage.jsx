@@ -25,7 +25,7 @@ export default function TrialRequestsPage() {
     setTimeout(() => setToast(null), 3000);
   }
 
-  async function handleAction(id, hwid, action) {
+  async function handleAction(id, action) {
     setActioning(id + action);
     try {
       const fn = action === 'approve' ? trialRequestsApi.approve : trialRequestsApi.reject;
@@ -121,7 +121,7 @@ export default function TrialRequestsPage() {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                 <button
-                  onClick={() => handleAction(req.id, req.hwid, 'approve')}
+                  onClick={() => handleAction(req.id, 'approve')}
                   disabled={actioning !== null}
                   className="flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
                 >
@@ -131,7 +131,7 @@ export default function TrialRequestsPage() {
                   Approve Trial
                 </button>
                 <button
-                  onClick={() => handleAction(req.id, req.hwid, 'reject')}
+                  onClick={() => handleAction(req.id, 'reject')}
                   disabled={actioning !== null}
                   className="flex items-center justify-center gap-2 px-4 py-2.5 border border-red-200 bg-red-50 hover:bg-red-100 disabled:opacity-50 text-red-600 text-sm font-semibold rounded-xl transition-colors"
                 >
