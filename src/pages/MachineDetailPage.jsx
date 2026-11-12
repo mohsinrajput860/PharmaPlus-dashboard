@@ -9,7 +9,8 @@ import {
   CheckCircle2, ShieldOff, Gift, RefreshCw, Save, Trash2,
   Activity, Hash, Smartphone, CloudUpload,
   Users, Network, BarChart2, ShoppingCart, Wallet, RotateCcw, Truck,
-  AlertTriangle, Edit3, X, Check, Info
+  AlertTriangle, Edit3, X, Check, Info,
+  Terminal, LayoutDashboard, Zap, ChevronDown, ChevronUp,
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 
@@ -35,13 +36,128 @@ const FEATURE_LIST = [
 ];
 
 const LOG_COLORS = {
-  authorized:      'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
-  revoked:         'text-red-400 bg-red-500/10 border-red-500/20',
-  trial:           'text-blue-400 bg-blue-500/10 border-blue-500/20',
-  registered:      'text-slate-400 bg-slate-500/10 border-slate-500/20',
-  feature_updated: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
-  extended:        'text-amber-400 bg-amber-500/10 border-amber-500/20',
+  authorized:      { card: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20', dot: 'bg-emerald-500' },
+  revoked:         { card: 'text-red-400 bg-red-500/10 border-red-500/20',             dot: 'bg-red-500'     },
+  trial:           { card: 'text-blue-400 bg-blue-500/10 border-blue-500/20',          dot: 'bg-blue-500'    },
+  registered:      { card: 'text-slate-400 bg-slate-500/10 border-slate-500/20',       dot: 'bg-slate-500'   },
+  feature_updated: { card: 'text-purple-400 bg-purple-500/10 border-purple-500/20',    dot: 'bg-purple-500'  },
+  extended:        { card: 'text-amber-400 bg-amber-500/10 border-amber-500/20',       dot: 'bg-amber-500'   },
 };
+
+const ACTION_LABELS = {
+  authorized:      'License Authorized',
+  revoked:         'License Revoked',
+  trial:           'Trial Granted',
+  registered:      'Machine Registered',
+  feature_updated: 'Features Updated',
+  extended:        'License Extended',
+};
+
+// Source badge — shows where the action came from
+function SourceBadge({ source }) {
+  if (!source || source === 'admin') return null;
+  if (source === 'developer_panel') {
+    return (
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-500/15 border border-orange-500/30 text-orange-400 ml-1.5 flex-shrink-0">
+        <Terminal size={9} /> Dev Panel
+      </span>
+    );
+  }
+  if (source === 'dashboard') {
+    return (
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-brand-500/15 border border-brand-500/30 text-brand-400 ml-1.5 flex-shrink-0">
+        <LayoutDashboard size={9} /> Dashboard
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-700 border border-slate-600 text-slate-400 ml-1.5 flex-shrink-0">
+      {source}
+    </span>
+  );
+}
+
+// Parse changes from detail string like "Features updated via dashboard. Changes: Mobile App: OFF → ON, Cloud Backup: ON → OFF"
+function FeatureDiffBadges({ detail }) {
+  if (!detail) return null;
+  const match = detail.match(/Changes:\s*(.+)$/i);
+  if (!match) return null;
+  const changes = match[1].split(',').map(s => s.trim()).filter(Boolean);
+  if (changes.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-1 mt-2">
+      {changes.map((change, i) => {
+        const isEnable  = change.includes('→ ON');
+        const isDisable = change.includes('→ OFF');
+        return (
+          <span key={i} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+            isEnable
+              ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400'
+              : isDisable
+                ? 'bg-red-500/10 border-red-500/25 text-red-400'
+                : 'bg-slate-700 border-slate-600 text-slate-400'
+          }`}>
+            {isEnable ? '▲' : isDisable ? '▼' : '·'} {change}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+// Single log entry with expand/collapse for long detail
+function LogEntry({ log }) {
+  const [expanded, setExpanded] = useState(false);
+  const colors    = LOG_COLORS[log.action]  || LOG_COLORS.registered;
+  const hasChanges = log.action === 'feature_updated' && log.detail?.includes('Changes:');
+  // For feature_updated, extract the preamble (before "Changes:") as summary
+  const summary = log.action === 'feature_updated' && log.detail
+    ? log.detail.split('.')[0] + (log.detail.includes('no changes') ? ' (no changes)' : '.')
+    : log.detail;
+
+  return (
+    <div className={`p-3 rounded-xl border text-xs ${colors.card}`}>
+      {/* Top row: action label + source badge + timestamp */}
+      <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${colors.dot}`} />
+          <span className="font-black uppercase tracking-wide text-[11px]">
+            {ACTION_LABELS[log.action] || log.action}
+          </span>
+          <SourceBadge source={log.performed_by} />
+        </div>
+        <span className="text-slate-500 whitespace-nowrap text-[10px]">
+          {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
+          <span className="ml-1.5 text-slate-600 hidden sm:inline">
+            · {format(new Date(log.created_at), 'dd MMM yyyy, HH:mm')}
+          </span>
+        </span>
+      </div>
+
+      {/* Detail — summary line */}
+      <p className="text-slate-300 break-words leading-relaxed">{summary}</p>
+
+      {/* Feature diff badges */}
+      {hasChanges && <FeatureDiffBadges detail={log.detail} />}
+
+      {/* Expand button for long details */}
+      {log.detail && log.detail.length > 120 && (
+        <button
+          onClick={() => setExpanded(v => !v)}
+          className="flex items-center gap-1 mt-1.5 text-slate-500 hover:text-slate-300 transition-colors"
+        >
+          {expanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+          {expanded ? 'Show less' : 'Full detail'}
+        </button>
+      )}
+      {expanded && (
+        <p className="mt-1.5 text-slate-400 break-all bg-black/20 rounded px-2 py-1.5 leading-relaxed">
+          {log.detail}
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default function MachineDetailPage() {
   const { hwid }   = useParams();
@@ -149,7 +265,7 @@ export default function MachineDetailPage() {
     setSaving(true);
     try {
       const { ok, data } = await machinesApi.updateFeatures(decodedHwid, features);
-      if (ok) showToast('Feature flags saved');
+      if (ok) { showToast('Feature flags saved'); load(); }
       else showToast(data.error || 'Failed', 'error');
     } finally { setSaving(false); }
   }
@@ -373,26 +489,45 @@ export default function MachineDetailPage() {
 
           {/* ── Activity Log ─────────────────────────────────────────────── */}
           <section className="bg-slate-900 border border-slate-800 rounded-2xl">
-            <div className="px-5 py-4 border-b border-slate-800 flex items-center gap-2">
-              <Clock size={16} className="text-brand-400" />
-              <h2 className="text-sm font-semibold text-white">Activity Log</h2>
+            <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Clock size={16} className="text-brand-400" />
+                <h2 className="text-sm font-semibold text-white">Activity Log</h2>
+                {logs.length > 0 && (
+                  <span className="text-[10px] font-bold bg-slate-800 border border-slate-700 text-slate-400 px-1.5 py-0.5 rounded-full">
+                    {logs.length}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                {/* Legend */}
+                <div className="hidden sm:flex items-center gap-3 text-[10px] text-slate-500">
+                  <span className="flex items-center gap-1">
+                    <LayoutDashboard size={9} className="text-brand-400" /> Dashboard
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Terminal size={9} className="text-orange-400" /> Dev Panel
+                  </span>
+                </div>
+                <button
+                  onClick={load}
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-colors"
+                  title="Refresh logs"
+                >
+                  <RefreshCw size={13} />
+                </button>
+              </div>
             </div>
             <div className="p-5">
               {logs.length === 0 ? (
-                <p className="text-slate-500 text-sm">No activity recorded.</p>
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Clock size={24} className="text-slate-700 mb-2" />
+                  <p className="text-slate-500 text-sm">No activity recorded yet.</p>
+                  <p className="text-slate-600 text-xs mt-1">Actions from both Dashboard and Developer Panel will appear here.</p>
+                </div>
               ) : (
                 <div className="space-y-2.5">
-                  {logs.map(log => (
-                    <div key={log.id} className={`p-3 rounded-lg border text-xs ${LOG_COLORS[log.action] || LOG_COLORS.registered}`}>
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        <span className="font-semibold capitalize">{log.action}</span>
-                        <span className="text-slate-500 whitespace-nowrap text-right">
-                          {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
-                        </span>
-                      </div>
-                      <span className="text-slate-300 break-words block">{log.detail}</span>
-                    </div>
-                  ))}
+                  {logs.map(log => <LogEntry key={log.id} log={log} />)}
                 </div>
               )}
             </div>

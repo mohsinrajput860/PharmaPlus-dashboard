@@ -53,7 +53,7 @@ export const machinesApi = {
   authorize:      (hwid, days)  => request('POST',   `/api/admin/machines/${encodeURIComponent(hwid)}/authorize`, { days }),
   revoke:         (hwid)        => request('POST',   `/api/admin/machines/${encodeURIComponent(hwid)}/revoke`),
   trial:          (hwid)        => request('POST',   `/api/admin/machines/${encodeURIComponent(hwid)}/trial`),
-  updateFeatures: (hwid, flags) => request('PUT',    `/api/admin/machines/${encodeURIComponent(hwid)}/features`, flags),
+  updateFeatures: (hwid, flags) => request('PUT',    `/api/admin/machines/${encodeURIComponent(hwid)}/features`, { ...flags, _source: 'dashboard' }),
   getLogs:        (hwid)        => request('GET',    `/api/admin/machines/${encodeURIComponent(hwid)}/logs`),
 };
 
